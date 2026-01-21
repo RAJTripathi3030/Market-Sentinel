@@ -23,6 +23,7 @@ def get_weather(location: str) -> str:
     This method returns the current weather information when called.
     """
     print(f"The current weather in {location} is sunny with a temperature of 75°F.")
+    return f"The current weather in {location} is sunny with a temperature of 75°F."
 
 def tavily_search(search_query: str) -> str:
     """
@@ -30,8 +31,7 @@ def tavily_search(search_query: str) -> str:
     """
     tavily_client = TavilyClient(api_key=tavily_api_key)
     response = tavily_client.search(search_query)
-
-    print(f"{response}")
+    return str(response)
 
 def tavily_crawl(crawl_url: str) -> str:
     """
@@ -39,19 +39,21 @@ def tavily_crawl(crawl_url: str) -> str:
     """
     tavily_client = TavilyClient(api_key=tavily_api_key)
     response = tavily_client.crawl(crawl_url)
-    print('\n')
-    print(f"{response}")
+    return str(response)
 
 scout = create_agent(
     model = llm,
     tools = [get_weather, tavily_search, tavily_crawl],
-    system_prompt = "You are a helpful assistant that provides weather information.",
+    system_prompt = "You are a helpful assistant that provides weather information and search results.",
 )
 
-scout.invoke(
-    {"messages": [
-        {"role": "user", "content": "what is the weather in sf"},
-        {"role": "user", "content": "who is Leo Messi?"},    
-        {"role": "user", "content": "https://docs.tavily.com/sdk/python/quick-start"}
-    ]}
-)
+def search_with_query(query: str):
+    """
+    Function to search using the scout agent with a given query
+    """
+    result = scout.invoke(
+        {"messages": [
+            {"role": "user", "content": query},    
+        ]}
+    )
+    return result
