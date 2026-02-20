@@ -2,6 +2,7 @@ import { useState } from 'react'
 import './App.css'
 
 import Input from './components/Input.jsx'
+import ModelSelect from './components/ModelSelect.jsx'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -12,6 +13,8 @@ function App() {
         Hello Tailwind!
       </h1> */}
       <Input />
+      <br/>
+      <ModelSelect />
     </>
   )
 }
