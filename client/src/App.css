@@ -1,8 +1,6 @@
-@import "tailwindcss";
-
+/* App-level layout — no Tailwind, pure CSS */
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
