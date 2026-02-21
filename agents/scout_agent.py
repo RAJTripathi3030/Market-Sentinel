@@ -1,4 +1,5 @@
 from google import genai
+from tavily import TavilyClient
 import os
 from dotenv import load_dotenv
 
@@ -6,7 +7,9 @@ load_dotenv()
 
 # ── API key ────────────────────────────────────────────────────────────────────
 GEMINI_API_KEY = os.getenv("GOOGLE_API_KEY")
-if GEMINI_API_KEY:
+TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
+
+if GEMINI_API_KEY and TAVILY_API_KEY:
     print("✔ API key loaded")
 else:
     print("✘ GOOGLE_API_KEY not found in environment")
@@ -62,37 +65,70 @@ def expand_query(user_query: str, model_name: str) -> str | None:
     return response.text
 
 
-# ── Search orchestrator ─────────────────────────────────────────────────────────
-def search_with_query(query: str, model: str) -> str:
+# ── Step 1: Query expansion (Gemini only) ─────────────────────────────────────
+def expand_query_only(query: str | None, model: str | None) -> str:
     """
-    Entry point called by the Flask backend.
-    1. Expands the raw query using the selected Gemini model.
-    2. Returns the expanded queries (Tavily search can be wired in here later).
+    Expands the raw user query into 3-5 sub-queries using the selected Gemini
+    model. Called by the /api/analyse endpoint.
 
     Args:
         query : raw user query
-        model : selected Gemini model name (e.g. 'models/gemini-2.0-flash')
+        model : full Gemini model name (e.g. 'models/gemini-2.0-flash')
 
     Returns:
-        A string with the expanded search queries.
+        A string of expanded sub-queries, one per line.
     """
     if not query:
         return "Error: empty query."
-
     if not model:
         return "Error: no model selected."
 
     try:
-        expanded = expand_query(query, model)
-        # ── Placeholder for Tavily / web search ────────────────────────────────
-        # When a TAVILY_API_KEY is configured you can add:
-        #   from tavily import TavilyClient
-        #   tv = TavilyClient(api_key=os.getenv("TAVILY_API_KEY"))
-        #   results = []
-        #   for sub_query in expanded.splitlines():
-        #       results.append(tv.search(sub_query))
-        #   return str(results)
-        # ───────────────────────────────────────────────────────────────────────
-        return f"**Expanded Queries (via {model.split('/')[-1]}):**\n\n{expanded}"
+        return expand_query(query, model)
     except Exception as e:
         return f"Error during query expansion: {str(e)}"
+
+
+# ── Step 2: Tavily web search ──────────────────────────────────────────────────
+def run_tavily_search(query: str) -> list:
+    """
+    Runs a Tavily search on the original query and returns structured results.
+    Called by the /api/search endpoint after the user has analysed their query.
+
+    Args:
+        query : the original raw user query
+
+    Returns:
+        A list of result dicts, each with keys: title, url, content, score.
+        Also includes a top-level 'answer' key if Tavily returns one.
+    """
+    if not TAVILY_API_KEY:
+        raise ValueError("TAVILY_API_KEY is not set in environment.")
+
+    tavily_client = TavilyClient(TAVILY_API_KEY)
+    response = tavily_client.search(
+        query=query,
+        include_answer="advanced",
+        topic="news",
+        search_depth="advanced",
+        max_results=6,
+    )
+
+    results = []
+    # Top-level synthesised answer (if available)
+    if response.get("answer"):
+        results.append({"type": "answer", "content": response["answer"]})
+
+    # Individual web results
+    for r in response.get("results", []):
+        results.append(
+            {
+                "type": "result",
+                "title": r.get("title", ""),
+                "url": r.get("url", ""),
+                "content": r.get("content", ""),
+                "score": r.get("score", 0),
+            }
+        )
+
+    return results

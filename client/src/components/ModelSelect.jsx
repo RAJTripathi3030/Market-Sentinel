@@ -12,6 +12,8 @@ function ModelSelect({ selectedModel, onModelChange }) {
     useEffect(() => { fetchModels(); }, []);
 
     /* ── Close on outside click ── */
+    // WHAT THE FOLLOWING FUNCTION DOES IS THAT IT CHECKS IF THE CURRENT ELEMENT I.E. THE DROPDOWN EXISTS, IF YES THEN IT CHECKS THAT IF THE CLICK HAPPENED OUTSIDE THIS DROPDOWN, IF YES THEN IT SETS IT'S STATE TO CLOSED (setIsOpen(false)) SO THAT THE DROPDOWN CLOSES WHEN WE CLICK ANYWHERE OUTSIDE IT.
+    // ALSO WE USED 'mousedown' INSTEAD OF 'click' BECAUSE IT FIRES UP A LITTLE EARLIER.
     useEffect(() => {
         const handler = (e) => {
             if (dropRef.current && !dropRef.current.contains(e.target)) setIsOpen(false);
