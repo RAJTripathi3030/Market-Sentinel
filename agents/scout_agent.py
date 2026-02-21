@@ -34,7 +34,7 @@ def get_model_name_list(api_key: str) -> list[str | None]:
 
 
 # ── Query expansion agent ───────────────────────────────────────────────────────
-def expand_query(user_query: str, model_name: str) -> str | None:
+def expand_query(user_query: str, model_name: str) -> str:
     """
     Uses the selected Gemini model to rewrite and expand the user's query,
     covering the topic from multiple angles for richer search results.
@@ -61,12 +61,14 @@ def expand_query(user_query: str, model_name: str) -> str | None:
         model=model_name,
         contents=prompt,
     )
-
-    return response.text
+    if response.text is not None: 
+        return response.text
+    else: 
+        return ""
 
 
 # ── Step 1: Query expansion (Gemini only) ─────────────────────────────────────
-def expand_query_only(query: str | None, model: str | None) -> str:
+def expand_query_only(query: str , model: str) -> str:
     """
     Expands the raw user query into 3-5 sub-queries using the selected Gemini
     model. Called by the /api/analyse endpoint.
