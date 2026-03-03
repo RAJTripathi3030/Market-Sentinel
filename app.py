@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from agents.scout_agent import expand_query_only, run_tavily_search, get_model_name_list
+from agents.analyzer_agent import run_full_pipeline
 import os
 from dotenv import load_dotenv
 
@@ -62,6 +63,34 @@ def search():
 
         results = run_tavily_search(query)
         return jsonify({"results": results}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/resultAnalyzer", methods=["POST"])
+def result_analyzer():
+    """
+    Step 3 — Runs the full 4-agent pipeline:
+    Data Analyst → Critic (± revision loop) → Strategy Director.
+    Accepts: { results, query, model }
+    Returns: { analyst_report, critic_verdict, strategy_report }
+    """
+    try:
+        data = request.json
+        results = data.get("results", [])
+        query = data.get("query", "").strip()
+        model = data.get("model", "").strip()
+
+        if not results:
+            return jsonify({"error": "Search results are required"}), 400
+        if not query:
+            return jsonify({"error": "Query is required"}), 400
+        if not model:
+            return jsonify({"error": "Model is required"}), 400
+
+        pipeline_output = run_full_pipeline(results, query, model)
+        return jsonify(pipeline_output), 200
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500

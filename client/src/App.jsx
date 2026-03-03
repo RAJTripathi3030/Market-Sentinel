@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import './App.css'
 import Input from './components/Input.jsx'
 import ModelSelect from './components/ModelSelect.jsx'
+import Instructions from './components/Instructions.jsx'
 
 /* ── Animated dot-grid background (canvas) ───────────────────────────────── */
 function DotGrid() {
@@ -73,7 +74,7 @@ function DotGrid() {
 }
 
 /* ── Navbar ──────────────────────────────────────────────────────────────── */
-function Navbar() {
+function Navbar({ onHowToUse }) {
   return (
     <nav style={styles.navbar}>
       <div style={styles.navInner}>
@@ -84,7 +85,15 @@ function Navbar() {
           </svg>
           <span style={styles.logoText}>Market<span style={styles.logoBold}>Sentinel</span></span>
         </div>
-        <span style={styles.navTag}>Multi-Agentic Research</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <span style={styles.navTag}>Multi-Agentic Research</span>
+          <button style={styles.howToBtn} onClick={onHowToUse}>
+            <svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
+            </svg>
+            How to Use
+          </button>
+        </div>
       </div>
     </nav>
   )
@@ -93,11 +102,13 @@ function Navbar() {
 /* ── App ─────────────────────────────────────────────────────────────────── */
 function App() {
   const [selectedModel, setSelectedModel] = useState('')
+  const [instructionsOpen, setInstructionsOpen] = useState(false)
 
   return (
     <div style={styles.root}>
       <DotGrid />
-      <Navbar />
+      <Navbar onHowToUse={() => setInstructionsOpen(true)} />
+      <Instructions isOpen={instructionsOpen} onClose={() => setInstructionsOpen(false)} />
 
       <main style={styles.main}>
         {/* Hero */}
@@ -108,8 +119,7 @@ function App() {
             <span style={styles.h1Accent}>at the speed of thought</span>
           </h1>
           <p style={styles.subtitle}>
-            Select a Gemini model, type your query — the agent expands it,
-            queries multiple angles, and surfaces what matters.
+            A 4-agent autonomous system that scouts the web, analyzes competitor moves, critiques its own findings, and delivers a strategic executive briefing.
           </p>
         </section>
 
@@ -157,6 +167,22 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     gap: 10,
+  },
+  howToBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 6,
+    padding: '6px 13px',
+    background: 'rgba(99,102,241,0.1)',
+    border: '1px solid rgba(99,102,241,0.25)',
+    borderRadius: 8,
+    color: '#818cf8',
+    fontSize: '0.75rem',
+    fontWeight: 600,
+    cursor: 'pointer',
+    fontFamily: 'Inter, sans-serif',
+    letterSpacing: '0.01em',
+    transition: 'background 0.2s ease',
   },
   logoText: {
     fontSize: '1.05rem',
