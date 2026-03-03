@@ -1,22 +1,51 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
-/* ── Design Tokens ─────────────────────────────────────────────────────────── */
+/* ── Design Tokens — Dark (default) ────────────────────────────────────────── */
 :root {
+  /* Background */
   --bg: #06060f;
-  --bg-card: rgba(255, 255, 255, 0.04);
-  --bg-card-hov: rgba(255, 255, 255, 0.08);
+  --bg-card: rgba(255, 255, 255, 0.03);
+  --bg-input: rgba(255, 255, 255, 0.05);
+  --bg-result-item: rgba(255, 255, 255, 0.03);
+  --navbar-bg: rgba(6, 6, 15, 0.75);
+
+  /* Borders */
   --border: rgba(255, 255, 255, 0.08);
-  --border-hov: rgba(99, 102, 241, 0.5);
-  --accent: #6366f1;
-  --accent-glow: rgba(99, 102, 241, 0.35);
-  --accent-2: #818cf8;
+  --border-subtle: rgba(255, 255, 255, 0.05);
+
+  /* Text */
   --text: #f1f5f9;
   --text-muted: #94a3b8;
   --text-dim: #475569;
+
+  /* Accent (overridden by JS when user picks a preset) */
+  --accent: #6366f1;
+  --accent-2: #818cf8;
+  --accent-glow: rgba(99, 102, 241, 0.35);
+  --border-hov: rgba(99, 102, 241, 0.5);
   --dot: #6366f1;
+
+  /* Misc */
   --radius: 14px;
   --radius-lg: 20px;
   --shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 24px 80px rgba(0, 0, 0, 0.7);
+}
+
+/* ── Design Tokens — Light ──────────────────────────────────────────────────── */
+[data-theme="light"] {
+  --bg: #f1f5f9;
+  --bg-card: rgba(0, 0, 0, 0.03);
+  --bg-input: rgba(0, 0, 0, 0.05);
+  --bg-result-item: rgba(0, 0, 0, 0.025);
+  --navbar-bg: rgba(241, 245, 249, 0.85);
+  --border: rgba(0, 0, 0, 0.09);
+  --border-subtle: rgba(0, 0, 0, 0.06);
+  --text: #0f172a;
+  --text-muted: #475569;
+  --text-dim: #94a3b8;
+  --shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 24px 80px rgba(0, 0, 0, 0.2);
 }
 
 /* ── Reset ──────────────────────────────────────────────────────────────────── */
@@ -40,90 +69,50 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* ── Keyframes ──────────────────────────────────────────────────────────────── */
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 @keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(22px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+@keyframes tabFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes pulseDot {
-
-  0%,
-  100% {
-    opacity: 0.15;
-    transform: scale(1);
-  }
-
-  50% {
-    opacity: 0.75;
-    transform: scale(1.6);
-  }
+  0%, 100% { opacity: 0.15; transform: scale(1);   }
+  50%       { opacity: 0.75; transform: scale(1.6); }
 }
 
 @keyframes spinRing {
-  to {
-    transform: rotate(360deg);
-  }
+  to { transform: rotate(360deg); }
 }
 
 @keyframes shimmer {
-  0% {
-    background-position: -200% center;
-  }
-
-  100% {
-    background-position: 200% center;
-  }
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
 }
 
 @keyframes float {
-
-  0%,
-  100% {
-    transform: translateY(0px);
-  }
-
-  50% {
-    transform: translateY(-8px);
-  }
+  0%, 100% { transform: translateY(0px);  }
+  50%       { transform: translateY(-8px); }
 }
 
 /* ── Utilities ──────────────────────────────────────────────────────────────── */
-.fade-in {
-  animation: fadeIn 0.5s ease both;
-}
-
-.slide-up {
-  animation: slideUp 0.5s ease both;
-}
+.fade-in    { animation: fadeIn    0.5s ease both; }
+.slide-up   { animation: slideUp   0.5s ease both; }
+.tab-active { animation: tabFadeIn 0.25s ease both; }

@@ -8,15 +8,22 @@ GEMINI_API_KEY = os.getenv("GOOGLE_API_KEY")
 
 
 # ── Shared Gemini caller ────────────────────────────────────────────────────────
-def _call_gemini(model: str, prompt: str) -> str:
+def _call_gemini(model: str, prompt: str, gemini_api_key: str = None) -> str:
     """Shared helper that calls Gemini and returns the text response."""
-    client = genai.Client(api_key=GEMINI_API_KEY)
+    key = gemini_api_key or GEMINI_API_KEY
+    client = genai.Client(api_key=key)
     response = client.models.generate_content(model=model, contents=prompt)
     return response.text.strip() if response.text else ""
 
 
 # ── Agent 2: Data Analyst ──────────────────────────────────────────────────────
-def run_data_analyst(results: list, query: str, model: str, feedback: str = "") -> str:
+def run_data_analyst(
+    results: list,
+    query: str,
+    model: str,
+    feedback: str = "",
+    gemini_api_key: str = None,
+) -> str:
     """
     Senior Market Analyst agent.
     Receives raw Tavily search results and produces a structured SWOT analysis.
@@ -74,11 +81,13 @@ def run_data_analyst(results: list, query: str, model: str, feedback: str = "") 
         f"{formatted}"
     )
 
-    return _call_gemini(model, prompt)
+    return _call_gemini(model, prompt, gemini_api_key)
 
 
 # ── Agent 3: The Critic ────────────────────────────────────────────────────────
-def run_critic(analyst_report: str, query: str, model: str) -> str:
+def run_critic(
+    analyst_report: str, query: str, model: str, gemini_api_key: str = None
+) -> str:
     """
     Ruthless Editor / Critic agent.
     Reviews the Analyst's report for logical fallacies, missing citations,
@@ -110,11 +119,13 @@ def run_critic(analyst_report: str, query: str, model: str) -> str:
         f"{analyst_report}"
     )
 
-    return _call_gemini(model, prompt)
+    return _call_gemini(model, prompt, gemini_api_key)
 
 
 # ── Agent 4: Strategy Director ─────────────────────────────────────────────────
-def run_strategy_director(analyst_report: str, query: str, model: str) -> str:
+def run_strategy_director(
+    analyst_report: str, query: str, model: str, gemini_api_key: str = None
+) -> str:
     """
     C-Suite Advisor / Strategy Director agent.
     Receives the Critic-approved analysis and produces final strategic recommendations.
@@ -148,48 +159,36 @@ def run_strategy_director(analyst_report: str, query: str, model: str) -> str:
         f"{analyst_report}"
     )
 
-    return _call_gemini(model, prompt)
+    return _call_gemini(model, prompt, gemini_api_key)
 
 
 # ── Orchestrator: Full Pipeline ────────────────────────────────────────────────
-def run_full_pipeline(results: list, query: str, model: str) -> dict:
+def run_full_pipeline(
+    results: list, query: str, model: str, gemini_api_key: str = None
+) -> dict:
     """
-    Orchestrates the full 3-agent analysis pipeline:
-    Data Analyst → Critic → (optional re-Analyst if rejected) → Strategy Director
-
-    Args:
-        results : Tavily search result list
-        query   : Original user query
-        model   : Gemini model name
-
-    Returns:
-        dict with keys: analyst_report, critic_verdict, strategy_report
+    Orchestrates the full 3-agent pipeline.
+    Uses gemini_api_key if provided, else falls back to env var.
     """
-    if not results:
-        raise ValueError("No search results to analyze.")
-    if not query:
-        raise ValueError("No query provided.")
-    if not model:
-        raise ValueError("No model selected.")
-    if not GEMINI_API_KEY:
-        raise ValueError("GOOGLE_API_KEY is not set in environment.")
+    eff_key = gemini_api_key or GEMINI_API_KEY
+    if not eff_key:
+        raise ValueError("GOOGLE_API_KEY is not set and no key was provided.")
 
-    # Step 1 — Data Analyst produces first report
-    analyst_report = run_data_analyst(results, query, model)
+    analyst_report = run_data_analyst(results, query, model, gemini_api_key=eff_key)
+    critic_verdict = run_critic(analyst_report, query, model, gemini_api_key=eff_key)
 
-    # Step 2 — Critic reviews the report
-    critic_verdict = run_critic(analyst_report, query, model)
-
-    # Step 3 — If Critic rejected, give Analyst one revision attempt
     if critic_verdict.upper().startswith("REJECTED"):
         feedback = critic_verdict[len("REJECTED:") :].strip()
-        analyst_report = run_data_analyst(results, query, model, feedback=feedback)
-        # Critic reviews once more (verdict is final after revision)
-        critic_verdict = run_critic(analyst_report, query, model)
+        analyst_report = run_data_analyst(
+            results, query, model, feedback=feedback, gemini_api_key=eff_key
+        )
+        critic_verdict = run_critic(
+            analyst_report, query, model, gemini_api_key=eff_key
+        )
 
-    # Step 4 — Strategy Director writes final output regardless of final verdict
-    # (so the user always gets output; the verdict is shown as context)
-    strategy_report = run_strategy_director(analyst_report, query, model)
+    strategy_report = run_strategy_director(
+        analyst_report, query, model, gemini_api_key=eff_key
+    )
 
     return {
         "analyst_report": analyst_report,

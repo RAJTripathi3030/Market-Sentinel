@@ -34,19 +34,10 @@ def get_model_name_list(api_key: str) -> list[str | None]:
 
 
 # ── Query expansion agent ───────────────────────────────────────────────────────
-def expand_query(user_query: str, model_name: str) -> str:
-    """
-    Uses the selected Gemini model to rewrite and expand the user's query,
-    covering the topic from multiple angles for richer search results.
-
-    Args:
-        user_query  : the raw query from the user
-        model_name  : full model name, e.g. 'models/gemini-2.0-flash'
-
-    Returns:
-        An expanded, multi-angle version of the query as a string.
-    """
-    client = genai.Client(api_key=GEMINI_API_KEY)
+def expand_query(user_query: str, model_name: str, gemini_api_key: str = None) -> str:
+    """Expands the raw query into 3-5 sub-queries using Gemini."""
+    key = gemini_api_key or GEMINI_API_KEY
+    client = genai.Client(api_key=key)
 
     prompt = (
         "You are a query-expansion agent for a financial market research system.\n"
@@ -61,53 +52,41 @@ def expand_query(user_query: str, model_name: str) -> str:
         model=model_name,
         contents=prompt,
     )
-    if response.text is not None: 
+    if response.text is not None:
         return response.text
-    else: 
+    else:
         return ""
 
 
 # ── Step 1: Query expansion (Gemini only) ─────────────────────────────────────
-def expand_query_only(query: str , model: str) -> str:
+def expand_query_only(query: str, model: str, gemini_api_key: str = None) -> str:
     """
-    Expands the raw user query into 3-5 sub-queries using the selected Gemini
-    model. Called by the /api/analyse endpoint.
-
-    Args:
-        query : raw user query
-        model : full Gemini model name (e.g. 'models/gemini-2.0-flash')
-
-    Returns:
-        A string of expanded sub-queries, one per line.
+    Expands the raw user query into 3-5 sub-queries.
+    Uses gemini_api_key if provided, else falls back to the environment variable.
     """
     if not query:
         return "Error: empty query."
     if not model:
         return "Error: no model selected."
-
     try:
-        return expand_query(query, model)
+        return expand_query(query, model, gemini_api_key=gemini_api_key)
     except Exception as e:
         return f"Error during query expansion: {str(e)}"
 
 
 # ── Step 2: Tavily web search ──────────────────────────────────────────────────
-def run_tavily_search(query: str) -> list:
+def run_tavily_search(query: str, tavily_api_key: str = None) -> list:
     """
     Runs a Tavily search on the original query and returns structured results.
-    Called by the /api/search endpoint after the user has analysed their query.
-
-    Args:
-        query : the original raw user query
-
-    Returns:
-        A list of result dicts, each with keys: title, url, content, score.
-        Also includes a top-level 'answer' key if Tavily returns one.
+    Uses tavily_api_key if provided, else falls back to the environment variable.
     """
-    if not TAVILY_API_KEY:
-        raise ValueError("TAVILY_API_KEY is not set in environment.")
+    key = tavily_api_key or TAVILY_API_KEY
+    if not key:
+        raise ValueError(
+            "TAVILY_API_KEY is not set in environment and no key was provided."
+        )
 
-    tavily_client = TavilyClient(TAVILY_API_KEY)
+    tavily_client = TavilyClient(key)
     response = tavily_client.search(
         query=query,
         include_answer="advanced",
@@ -117,11 +96,8 @@ def run_tavily_search(query: str) -> list:
     )
 
     results = []
-    # Top-level synthesised answer (if available)
     if response.get("answer"):
         results.append({"type": "answer", "content": response["answer"]})
-
-    # Individual web results
     for r in response.get("results", []):
         results.append(
             {
@@ -132,5 +108,4 @@ def run_tavily_search(query: str) -> list:
                 "score": r.get("score", 0),
             }
         )
-
     return results
