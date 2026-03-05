@@ -346,7 +346,7 @@ const Input = ({ selectedModel, onOpenSettings }) => {
         setCurrentTab(null)
         setQuotaError(false)
         try {
-            const res = await fetch('http://localhost:5000/api/analyse', {
+            const res = await fetch('/api/analyse', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ query, model: selectedModel, ...getStoredKeys() }),
@@ -377,7 +377,7 @@ const Input = ({ selectedModel, onOpenSettings }) => {
         setReportResult(null)
         setQuotaError(false)
         try {
-            const res = await fetch('http://localhost:5000/api/search', {
+            const res = await fetch('/api/search', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ query, ...getStoredKeys() }),
@@ -406,7 +406,7 @@ const Input = ({ selectedModel, onOpenSettings }) => {
         setReportResult(null)
         setQuotaError(false)
         try {
-            const res = await fetch('http://localhost:5000/api/resultAnalyzer', {
+            const res = await fetch('/api/resultAnalyzer', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ results: searchResult, query, model: selectedModel, ...getStoredKeys() }),

@@ -12,8 +12,6 @@ function ModelSelect({ selectedModel, onModelChange }) {
     useEffect(() => { fetchModels(); }, []);
 
     /* ── Close on outside click ── */
-    // WHAT THE FOLLOWING FUNCTION DOES IS THAT IT CHECKS IF THE CURRENT ELEMENT I.E. THE DROPDOWN EXISTS, IF YES THEN IT CHECKS THAT IF THE CLICK HAPPENED OUTSIDE THIS DROPDOWN, IF YES THEN IT SETS IT'S STATE TO CLOSED (setIsOpen(false)) SO THAT THE DROPDOWN CLOSES WHEN WE CLICK ANYWHERE OUTSIDE IT.
-    // ALSO WE USED 'mousedown' INSTEAD OF 'click' BECAUSE IT FIRES UP A LITTLE EARLIER.
     useEffect(() => {
         const handler = (e) => {
             if (dropRef.current && !dropRef.current.contains(e.target)) setIsOpen(false);
@@ -26,7 +24,7 @@ function ModelSelect({ selectedModel, onModelChange }) {
         setLoading(true);
         setError('');
         try {
-            const res = await fetch('http://localhost:5000/api/models');
+            const res = await fetch('/api/models');
             const data = await res.json();
             if (res.ok) setModels(data.models);
             else setError(data.error || 'Failed to fetch models');
@@ -62,9 +60,14 @@ function ModelSelect({ selectedModel, onModelChange }) {
                     ...(selectedModel ? styles.triggerActive : {}),
                 }}
             >
-                <span style={styles.triggerText}>{displayText}</span>
+                <span style={{
+                    ...styles.triggerText,
+                    color: selectedModel ? 'var(--text)' : 'var(--text-dim)',
+                }}>
+                    {displayText}
+                </span>
                 <svg
-                    style={{ ...styles.chevron, ...(isOpen ? styles.chevronOpen : {}) }}
+                    style={{ ...styles.chevron, ...(isOpen ? styles.chevronOpen : {}), color: 'var(--text-dim)' }}
                     viewBox="0 0 20 20" fill="currentColor"
                 >
                     <path fillRule="evenodd"
@@ -108,7 +111,7 @@ function ModelSelect({ selectedModel, onModelChange }) {
                                 }}
                                 onMouseEnter={e => {
                                     if (model !== selectedModel)
-                                        e.currentTarget.style.background = 'rgba(99,102,241,0.1)';
+                                        e.currentTarget.style.background = 'var(--accent-glow)';
                                 }}
                                 onMouseLeave={e => {
                                     if (model !== selectedModel)
@@ -126,7 +129,7 @@ function ModelSelect({ selectedModel, onModelChange }) {
     );
 }
 
-/* ── Styles ─────────────────────────────────────────────────────────────── */
+/* ── Styles — fully CSS-variable driven for light/dark theme support ── */
 const styles = {
     wrap: {
         position: 'relative',
@@ -137,10 +140,9 @@ const styles = {
         alignItems: 'center',
         gap: 8,
         padding: '9px 14px',
-        background: 'rgba(255,255,255,0.05)',
-        border: '1px solid rgba(255,255,255,0.1)',
+        background: 'var(--bg-input)',
+        border: '1px solid var(--border)',
         borderRadius: 10,
-        color: '#94a3b8',
         fontSize: '0.85rem',
         fontWeight: 500,
         cursor: 'pointer',
@@ -150,12 +152,11 @@ const styles = {
         justifyContent: 'space-between',
     },
     triggerOpen: {
-        borderColor: 'rgba(99,102,241,0.6)',
-        background: 'rgba(99,102,241,0.08)',
+        borderColor: 'var(--border-hov)',
+        background: 'var(--accent-glow)',
     },
     triggerActive: {
-        color: '#f1f5f9',
-        borderColor: 'rgba(99,102,241,0.4)',
+        borderColor: 'var(--border-hov)',
     },
     triggerText: {
         flex: 1,
@@ -163,6 +164,7 @@ const styles = {
         overflow: 'hidden',
         textOverflow: 'ellipsis',
         whiteSpace: 'nowrap',
+        fontFamily: 'Inter, sans-serif',
     },
     chevron: {
         width: 16,
@@ -179,10 +181,10 @@ const styles = {
         right: 0,
         zIndex: 200,
         minWidth: 280,
-        background: '#0f0f1e',
-        border: '1px solid rgba(99,102,241,0.25)',
+        background: 'var(--modal-bg)',
+        border: '1px solid var(--border-hov)',
         borderRadius: 14,
-        boxShadow: '0 16px 48px rgba(0,0,0,0.7)',
+        boxShadow: 'var(--shadow-lg)',
         overflow: 'hidden',
         animationName: 'slideDown',
         animationDuration: '0.2s',
@@ -193,12 +195,12 @@ const styles = {
         alignItems: 'center',
         gap: 10,
         padding: '10px 14px',
-        borderBottom: '1px solid rgba(255,255,255,0.06)',
+        borderBottom: '1px solid var(--border)',
     },
     searchIcon: {
         width: 15,
         height: 15,
-        color: '#475569',
+        color: 'var(--text-dim)',
         flexShrink: 0,
     },
     searchInput: {
@@ -206,7 +208,7 @@ const styles = {
         background: 'none',
         border: 'none',
         outline: 'none',
-        color: '#f1f5f9',
+        color: 'var(--text)',
         fontSize: '0.85rem',
         fontFamily: 'Inter, sans-serif',
     },
@@ -218,7 +220,7 @@ const styles = {
     hint: {
         padding: '10px 12px',
         fontSize: '0.8rem',
-        color: '#475569',
+        color: 'var(--text-dim)',
         fontFamily: 'Inter, sans-serif',
     },
     item: {
@@ -230,7 +232,7 @@ const styles = {
         background: 'transparent',
         border: 'none',
         borderRadius: 8,
-        color: '#cbd5e1',
+        color: 'var(--text-muted)',
         fontSize: '0.83rem',
         fontFamily: 'Inter, sans-serif',
         cursor: 'pointer',
@@ -238,24 +240,16 @@ const styles = {
         transition: 'background 0.15s ease',
     },
     itemActive: {
-        background: 'rgba(99,102,241,0.18)',
-        color: '#818cf8',
+        background: 'var(--accent-glow)',
+        color: 'var(--accent-2)',
     },
     modelDot: {
         width: 6,
         height: 6,
         borderRadius: '50%',
-        background: '#6366f1',
+        background: 'var(--accent)',
         flexShrink: 0,
     },
 };
-
-/* -- add slideDown keyframe via <style> tag once ─────────────────────────── */
-if (!document.getElementById('ms-anim')) {
-    const s = document.createElement('style');
-    s.id = 'ms-anim';
-    s.textContent = `@keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}`;
-    document.head.appendChild(s);
-}
 
 export default ModelSelect;

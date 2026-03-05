@@ -44,7 +44,7 @@ const ThemeContext = createContext(null)
 
 /* ── ThemeProvider ──────────────────────────────────────────────────────────── */
 export function ThemeProvider({ children }) {
-    const [mode, setModeState] = useState(() => localStorage.getItem('ms_theme') || 'dark')
+    const [mode, setModeState] = useState(() => localStorage.getItem('ms_theme') || 'light')
     const [accentKey, setAccentKeyState] = useState(() => localStorage.getItem('ms_accent') || 'indigo')
 
     /* Apply Light / Dark / System */

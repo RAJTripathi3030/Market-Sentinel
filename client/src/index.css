@@ -1,51 +1,63 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
-/* ── Design Tokens — Dark (default) ────────────────────────────────────────── */
+/* ── Design Tokens — Light (default) ───────────────────────────────────────── */
 :root {
   /* Background */
+  --bg: #f8fafc;
+  --bg-card: rgba(255, 255, 255, 0.85);
+  --bg-input: rgba(0, 0, 0, 0.04);
+  --bg-result-item: rgba(0, 0, 0, 0.025);
+  --navbar-bg: rgba(248, 250, 252, 0.75);
+
+  /* Borders */
+  --border: rgba(0, 0, 0, 0.09);
+  --border-subtle: rgba(0, 0, 0, 0.06);
+
+  /* Text */
+  --text: #0f172a;
+  --text-muted: #475569;
+  --text-dim: #94a3b8;
+
+  /* Accent (overridden by JS when user picks a preset) */
+  --accent: #6366f1;
+  --accent-2: #818cf8;
+  --accent-glow: rgba(99, 102, 241, 0.2);
+  --border-hov: rgba(99, 102, 241, 0.5);
+  --dot: #6366f1;
+
+  /* Glass / Blur */
+  --glass-blur: blur(24px) saturate(180%);
+  --navbar-border-glow: rgba(99, 102, 241, 0.12);
+
+  /* Misc */
+  --radius: 14px;
+  --radius-lg: 20px;
+  --shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 24px 80px rgba(0, 0, 0, 0.12);
+  --modal-bg: rgba(255, 255, 255, 0.97);
+  --modal-header-bg: rgba(255, 255, 255, 0.95);
+  --trigger-bg: rgba(0,0,0,0.04);
+}
+
+/* ── Design Tokens — Dark ───────────────────────────────────────────────────── */
+[data-theme="dark"] {
   --bg: #06060f;
   --bg-card: rgba(255, 255, 255, 0.03);
   --bg-input: rgba(255, 255, 255, 0.05);
   --bg-result-item: rgba(255, 255, 255, 0.03);
   --navbar-bg: rgba(6, 6, 15, 0.75);
-
-  /* Borders */
   --border: rgba(255, 255, 255, 0.08);
   --border-subtle: rgba(255, 255, 255, 0.05);
-
-  /* Text */
   --text: #f1f5f9;
   --text-muted: #94a3b8;
   --text-dim: #475569;
-
-  /* Accent (overridden by JS when user picks a preset) */
-  --accent: #6366f1;
-  --accent-2: #818cf8;
-  --accent-glow: rgba(99, 102, 241, 0.35);
-  --border-hov: rgba(99, 102, 241, 0.5);
-  --dot: #6366f1;
-
-  /* Misc */
-  --radius: 14px;
-  --radius-lg: 20px;
   --shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
   --shadow-lg: 0 24px 80px rgba(0, 0, 0, 0.7);
-}
-
-/* ── Design Tokens — Light ──────────────────────────────────────────────────── */
-[data-theme="light"] {
-  --bg: #f1f5f9;
-  --bg-card: rgba(0, 0, 0, 0.03);
-  --bg-input: rgba(0, 0, 0, 0.05);
-  --bg-result-item: rgba(0, 0, 0, 0.025);
-  --navbar-bg: rgba(241, 245, 249, 0.85);
-  --border: rgba(0, 0, 0, 0.09);
-  --border-subtle: rgba(0, 0, 0, 0.06);
-  --text: #0f172a;
-  --text-muted: #475569;
-  --text-dim: #94a3b8;
-  --shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 24px 80px rgba(0, 0, 0, 0.2);
+  --modal-bg: rgba(10, 10, 22, 0.98);
+  --modal-header-bg: rgba(10, 10, 22, 0.97);
+  --trigger-bg: rgba(0,0,0,0.2);
+  --glass-blur: blur(24px) saturate(160%);
+  --navbar-border-glow: rgba(99, 102, 241, 0.15);
 }
 
 /* ── Reset ──────────────────────────────────────────────────────────────────── */
@@ -69,7 +81,7 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background-color 0.4s ease, color 0.4s ease;
 }
 
 /* ── Keyframes ──────────────────────────────────────────────────────────────── */
@@ -112,7 +124,74 @@ body {
   50%       { transform: translateY(-8px); }
 }
 
+@keyframes orbFloat {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%       { transform: translate(30px, -20px) scale(1.05); }
+  66%       { transform: translate(-15px, 20px) scale(0.97); }
+}
+
+@keyframes orbFloat2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%       { transform: translate(-25px, 15px) scale(1.03); }
+  66%       { transform: translate(20px, -25px) scale(0.98); }
+}
+
+@keyframes lineGrow {
+  from { stroke-dashoffset: 500; opacity: 0; }
+  to   { stroke-dashoffset: 0;   opacity: 1; }
+}
+
+@keyframes gradientShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes revealUp {
+  from { opacity: 0; transform: translateY(32px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes revealFade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes stepPop {
+  0%   { opacity: 0; transform: scale(0.8) translateY(10px); }
+  70%  { transform: scale(1.05) translateY(-2px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes connectorDraw {
+  from { width: 0; opacity: 0; }
+  to   { width: 40px; opacity: 1; }
+}
+
+/* ── Scroll Reveal ──────────────────────────────────────────────────────────── */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.scroll-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Staggered children */
+.scroll-reveal:nth-child(2) { transition-delay: 0.08s; }
+.scroll-reveal:nth-child(3) { transition-delay: 0.16s; }
+.scroll-reveal:nth-child(4) { transition-delay: 0.24s; }
+
 /* ── Utilities ──────────────────────────────────────────────────────────────── */
 .fade-in    { animation: fadeIn    0.5s ease both; }
 .slide-up   { animation: slideUp   0.5s ease both; }
 .tab-active { animation: tabFadeIn 0.25s ease both; }
+
+/* ── Scrollbar ──────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar       { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }

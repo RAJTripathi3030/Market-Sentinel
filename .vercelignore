@@ -1,0 +1,17 @@
+# Ignore Python virtual environment
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# Ignore local env files — set these as env vars in Vercel dashboard instead
+.env
+
+# Ignore local node_modules (Vercel installs these itself)
+client/node_modules/
+
+# Ignore mypy cache
+.mypy_cache/
+
+# Ignore git directory
+.git/

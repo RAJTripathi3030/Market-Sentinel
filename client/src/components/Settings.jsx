@@ -1,6 +1,27 @@
 import { useState } from 'react'
 import { useTheme, ACCENTS } from '../context/ThemeContext.jsx'
 
+/* SVG Eye / EyeOff icons — reliable across all platforms */
+function EyeIcon() {
+    return (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+            <circle cx="12" cy="12" r="3" />
+        </svg>
+    )
+}
+
+function EyeOffIcon() {
+    return (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24" />
+            <line x1="1" y1="1" x2="23" y2="23" />
+        </svg>
+    )
+}
+
 /* ── Settings Modal ─────────────────────────────────────────────────────────── */
 export default function Settings({ isOpen, onClose }) {
     const { mode, accentKey, setMode, setAccentKey } = useTheme()
@@ -30,19 +51,17 @@ export default function Settings({ isOpen, onClose }) {
         setTavilyKey('')
     }
 
-    const isDark = mode === 'dark' || (mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
-
     return (
         <div style={styles.overlay} onClick={onClose}>
-            <div style={{ ...styles.modal, background: isDark ? 'rgba(10,10,22,0.98)' : 'rgba(250,251,252,0.99)' }} onClick={e => e.stopPropagation()}>
+            <div style={styles.modal} onClick={e => e.stopPropagation()}>
 
                 {/* Header */}
-                <div style={{ ...styles.header, borderColor: 'var(--border)' }}>
+                <div style={styles.header}>
                     <div>
-                        <h2 style={{ ...styles.title, color: 'var(--text)' }}>Settings</h2>
-                        <p style={{ ...styles.subtitle, color: 'var(--text-dim)' }}>Appearance & API Configuration</p>
+                        <h2 style={styles.title}>Settings</h2>
+                        <p style={styles.subtitle}>Appearance & API Configuration</p>
                     </div>
-                    <button style={{ ...styles.closeBtn, borderColor: 'var(--border)', color: 'var(--text-muted)' }} onClick={onClose}>
+                    <button style={styles.closeBtn} onClick={onClose}>
                         <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
                             <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
                         </svg>
@@ -52,11 +71,11 @@ export default function Settings({ isOpen, onClose }) {
                 <div style={styles.body}>
                     {/* ── Appearance ── */}
                     <section style={styles.section}>
-                        <p style={{ ...styles.sectionLabel, color: 'var(--text-dim)' }}>APPEARANCE</p>
+                        <p style={styles.sectionLabel}>APPEARANCE</p>
 
                         {/* Theme mode */}
                         <div style={styles.fieldRow}>
-                            <span style={{ ...styles.fieldLabel, color: 'var(--text-muted)' }}>Theme</span>
+                            <span style={styles.fieldLabel}>Theme</span>
                             <div style={styles.modeGroup}>
                                 {['dark', 'light', 'system'].map(m => (
                                     <button
@@ -77,7 +96,7 @@ export default function Settings({ isOpen, onClose }) {
 
                         {/* Accent */}
                         <div style={styles.fieldRow}>
-                            <span style={{ ...styles.fieldLabel, color: 'var(--text-muted)' }}>Accent</span>
+                            <span style={styles.fieldLabel}>Accent</span>
                             <div style={styles.accentGroup}>
                                 {Object.entries(ACCENTS).map(([key, a]) => (
                                     <button
@@ -98,52 +117,52 @@ export default function Settings({ isOpen, onClose }) {
                                         )}
                                     </button>
                                 ))}
-                                <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontFamily: 'Inter, sans-serif', alignSelf: 'center', marginLeft: 4 }}>
+                                <span style={styles.accentLabel}>
                                     {ACCENTS[accentKey]?.label}
                                 </span>
                             </div>
                         </div>
                     </section>
 
-                    <div style={{ ...styles.divider, background: 'var(--border)' }} />
+                    <div style={styles.divider} />
 
                     {/* ── API Keys ── */}
                     <section style={styles.section}>
-                        <p style={{ ...styles.sectionLabel, color: 'var(--text-dim)' }}>API KEYS</p>
-                        <p style={{ ...styles.hint, color: 'var(--text-dim)' }}>
+                        <p style={styles.sectionLabel}>API KEYS</p>
+                        <p style={styles.hint}>
                             Stored in localStorage only — never sent to any server other than the respective API. Your keys take priority over the default server keys.
                         </p>
 
                         {/* Gemini */}
                         <div style={styles.keyField}>
-                            <label style={{ ...styles.keyLabel, color: 'var(--text-muted)' }}>Gemini API Key</label>
-                            <div style={{ ...styles.keyInputWrap, background: 'var(--bg-input)', border: `1px solid var(--border)` }}>
+                            <label style={styles.keyLabel}>Gemini API Key</label>
+                            <div style={styles.keyInputWrap}>
                                 <input
                                     type={showGemini ? 'text' : 'password'}
                                     value={geminiKey}
                                     onChange={e => setGeminiKey(e.target.value)}
                                     placeholder="AIza..."
-                                    style={{ ...styles.keyInput, color: 'var(--text)' }}
+                                    style={styles.keyInput}
                                 />
-                                <button style={{ ...styles.eyeBtn, color: 'var(--text-dim)' }} onClick={() => setShowGemini(v => !v)}>
-                                    {showGemini ? '🙈' : '👁'}
+                                <button style={styles.eyeBtn} onClick={() => setShowGemini(v => !v)} title={showGemini ? 'Hide key' : 'Show key'}>
+                                    {showGemini ? <EyeOffIcon /> : <EyeIcon />}
                                 </button>
                             </div>
                         </div>
 
                         {/* Tavily */}
                         <div style={styles.keyField}>
-                            <label style={{ ...styles.keyLabel, color: 'var(--text-muted)' }}>Tavily API Key</label>
-                            <div style={{ ...styles.keyInputWrap, background: 'var(--bg-input)', border: `1px solid var(--border)` }}>
+                            <label style={styles.keyLabel}>Tavily API Key</label>
+                            <div style={styles.keyInputWrap}>
                                 <input
                                     type={showTavily ? 'text' : 'password'}
                                     value={tavilyKey}
                                     onChange={e => setTavilyKey(e.target.value)}
                                     placeholder="tvly-..."
-                                    style={{ ...styles.keyInput, color: 'var(--text)' }}
+                                    style={styles.keyInput}
                                 />
-                                <button style={{ ...styles.eyeBtn, color: 'var(--text-dim)' }} onClick={() => setShowTavily(v => !v)}>
-                                    {showTavily ? '🙈' : '👁'}
+                                <button style={styles.eyeBtn} onClick={() => setShowTavily(v => !v)} title={showTavily ? 'Hide key' : 'Show key'}>
+                                    {showTavily ? <EyeOffIcon /> : <EyeIcon />}
                                 </button>
                             </div>
                         </div>
@@ -156,7 +175,7 @@ export default function Settings({ isOpen, onClose }) {
                             }} onClick={handleSave}>
                                 {saved ? '✓ Saved' : 'Save Keys'}
                             </button>
-                            <button style={{ ...styles.clearBtn, color: 'var(--text-muted)', borderColor: 'var(--border)' }} onClick={handleClear}>
+                            <button style={styles.clearBtn} onClick={handleClear}>
                                 Clear Keys
                             </button>
                         </div>
@@ -172,21 +191,24 @@ const styles = {
         position: 'fixed',
         inset: 0,
         zIndex: 999,
-        background: 'rgba(0,0,0,0.65)',
-        backdropFilter: 'blur(6px)',
+        background: 'rgba(0,0,0,0.45)',
+        backdropFilter: 'blur(8px)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         padding: 24,
+        animation: 'fadeIn 0.2s ease both',
     },
     modal: {
         width: '100%',
         maxWidth: 520,
         maxHeight: '88vh',
         overflowY: 'auto',
+        background: 'var(--modal-bg)',
         border: '1px solid var(--border)',
         borderRadius: 20,
         boxShadow: 'var(--shadow-lg)',
+        animation: 'slideUp 0.3s cubic-bezier(0.22,1,0.36,1) both',
     },
     header: {
         display: 'flex',
@@ -197,10 +219,11 @@ const styles = {
         position: 'sticky',
         top: 0,
         zIndex: 10,
+        background: 'var(--modal-header-bg)',
         backdropFilter: 'blur(20px)',
     },
-    title: { margin: 0, fontSize: '1.1rem', fontWeight: 700, fontFamily: 'Inter, sans-serif' },
-    subtitle: { margin: '3px 0 0', fontSize: '0.78rem', fontFamily: 'Inter, sans-serif' },
+    title: { margin: 0, fontSize: '1.1rem', fontWeight: 700, fontFamily: 'Inter, sans-serif', color: 'var(--text)' },
+    subtitle: { margin: '3px 0 0', fontSize: '0.78rem', fontFamily: 'Inter, sans-serif', color: 'var(--text-dim)' },
     closeBtn: {
         background: 'var(--bg-input)',
         border: '1px solid var(--border)',
@@ -211,6 +234,8 @@ const styles = {
         alignItems: 'center',
         justifyContent: 'center',
         flexShrink: 0,
+        color: 'var(--text-muted)',
+        transition: 'background 0.2s ease',
     },
     body: { padding: '24px 28px 28px', display: 'flex', flexDirection: 'column', gap: 0 },
     section: { display: 'flex', flexDirection: 'column', gap: 14 },
@@ -221,10 +246,11 @@ const styles = {
         textTransform: 'uppercase',
         fontFamily: 'Inter, sans-serif',
         marginBottom: 2,
+        color: 'var(--text-dim)',
     },
-    divider: { height: 1, margin: '22px 0' },
+    divider: { height: 1, margin: '22px 0', background: 'var(--border)' },
     fieldRow: { display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' },
-    fieldLabel: { fontSize: '0.82rem', fontWeight: 500, fontFamily: 'Inter, sans-serif', width: 52, flexShrink: 0 },
+    fieldLabel: { fontSize: '0.82rem', fontWeight: 500, fontFamily: 'Inter, sans-serif', width: 52, flexShrink: 0, color: 'var(--text-muted)' },
     modeGroup: { display: 'flex', gap: 6 },
     modeBtn: {
         padding: '6px 12px',
@@ -248,19 +274,30 @@ const styles = {
         transition: 'outline 0.15s ease, transform 0.15s ease',
         flexShrink: 0,
     },
+    accentLabel: {
+        color: 'var(--text-muted)',
+        fontSize: '0.8rem',
+        fontFamily: 'Inter, sans-serif',
+        alignSelf: 'center',
+        marginLeft: 4,
+    },
     hint: {
         fontSize: '0.75rem',
         lineHeight: 1.55,
         fontFamily: 'Inter, sans-serif',
         marginBottom: 4,
+        color: 'var(--text-dim)',
     },
     keyField: { display: 'flex', flexDirection: 'column', gap: 6 },
-    keyLabel: { fontSize: '0.78rem', fontWeight: 500, fontFamily: 'Inter, sans-serif' },
+    keyLabel: { fontSize: '0.78rem', fontWeight: 500, fontFamily: 'Inter, sans-serif', color: 'var(--text-muted)' },
     keyInputWrap: {
         display: 'flex',
         alignItems: 'center',
         borderRadius: 10,
         overflow: 'hidden',
+        background: 'var(--bg-input)',
+        border: '1px solid var(--border)',
+        transition: 'border-color 0.2s ease',
     },
     keyInput: {
         flex: 1,
@@ -270,14 +307,20 @@ const styles = {
         padding: '10px 14px',
         fontSize: '0.85rem',
         fontFamily: 'Inter, sans-serif',
+        color: 'var(--text)',
     },
     eyeBtn: {
         background: 'none',
         border: 'none',
         cursor: 'pointer',
         padding: '0 12px',
-        fontSize: '1rem',
-        lineHeight: 1,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: 'var(--text-dim)',
+        transition: 'color 0.2s ease',
+        height: '100%',
+        minHeight: 40,
     },
     keyActions: { display: 'flex', gap: 10, marginTop: 4 },
     saveBtn: {
@@ -294,11 +337,13 @@ const styles = {
     clearBtn: {
         padding: '9px 16px',
         borderRadius: 10,
-        border: '1px solid',
+        border: '1px solid var(--border)',
         background: 'transparent',
         fontSize: '0.82rem',
         fontWeight: 500,
         cursor: 'pointer',
         fontFamily: 'Inter, sans-serif',
+        color: 'var(--text-muted)',
+        transition: 'border-color 0.2s ease',
     },
 }
